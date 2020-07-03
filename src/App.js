@@ -1,26 +1,57 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Season from './components/season/Season'
+import Loader from './components/loader/loader'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+//create component
+class App extends React.Component {
+    state = {
+        latitude: null,
+        errorMassage: ''
+    }
+    constructor(props) {
+        console.log('constructer is called');
+        super(props)
+    }
+    componentDidMount() {
+        console.log('Did Mount is called');
+
+        window.navigator.geolocation.getCurrentPosition((position) => {
+            // console.log('position', position);
+            this.setState({
+                latitude: position.coords.latitude,
+            })
+        }, (err) => {
+            console.log(err);
+            this.setState({ errorMassage: err.message })
+        })
+    }
+
+    componentDidUpdate() {
+        console.log('compoenent did update');
+    }
+
+    decideOutput() {
+        if (this.state.errorMassage) {
+            return (
+                <div>Error :{this.state.errorMassage}</div>)
+        }
+        else if (this.state.latitude) {
+            return (
+                <Season lat={this.state.latitude}></Season>
+            )
+        }
+        return (
+            <Loader message='Please, Allow Location to see the result'></Loader>
+        );
+    }
+
+    render() {
+        return (
+            <div>
+                {this.decideOutput()}
+            </div>
+        )
+    }
 }
 
 export default App;
